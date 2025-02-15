@@ -4,6 +4,7 @@ import { date, string, z } from 'zod';
 import { db } from '@vercel/postgres';
 import { InvoicesTable } from './definitions';
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 // import postgres from 'postgres';
 
 
@@ -41,5 +42,5 @@ export async function createInvoice(formData: FormData) {
     `;
 
     revalidatePath('/dashboard/invoices');
-
+    redirect('/dashboard/invoices');
 }
