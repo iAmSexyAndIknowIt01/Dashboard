@@ -1,53 +1,114 @@
-import AcmeLogo from '@/app/ui/acme-logo';
-import { ArrowRightIcon } from '@heroicons/react/24/outline';
-import Link from 'next/link';
-import Image from 'next/image';
-import styles from '@/app/ui/home.module.css';
-import { lusitana } from '@/app/ui/fonts';
+// app/login/page.tsx
+'use client';
 
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
-export default function Page(){
-    return (
-        <main className="flex min-h-screen flex-col p-6">
-        {/* <div className={styles.shape}/> */}
-        <div className="flex h-20 shrink-0 items-end rounded-lg bg-pink-500 p-4 md:h-52">
-          <AcmeLogo />
-          <p>ここはログインに必要になるデータを入力する</p>
-        </div>
-        <div className="mt-4 flex grow flex-col gap-4 md:flex-row">
-          <div className="flex flex-col justify-center gap-6 rounded-lg bg-gray-50 px-6 py-10 md:w-2/5 md:px-20">
-            <p className={`${lusitana.className} text-xl text-gray-800 md:text-3xl md:leading-normal`}>
-              <strong>Welcome to Acme.</strong> This is the <span className="text-pink-500">example</span> for the{' '}
-              <a href="https://nextjs.org/learn/" className="text-blue-500">
-                Next.js Learn Course
-              </a>
-              , <span className="text-pink-500">brought</span> to you by Vercel.
-            </p>
-            <Link
-              href="/dashboard"
-              className="flex items-center gap-5 self-start rounded-lg bg-pink-500 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-pink-400 md:text-base"
+export default function Page() {
+  const [isMounted, setIsMounted] = useState(false);
+  const router = useRouter();
+
+  // クライアントサイドでのマウント確認
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // 状態の管理
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  // ログインボタンがクリックされたときの処理
+  const handleLogin = (e: { preventDefault: () => void; }) => {
+    e.preventDefault();
+
+    // 簡単なバリデーション
+    if (email === "test@mail.com" && password === "1234") {
+      setError("");
+      router.push("/dashboard"); // 認証成功時に /dashboard に遷移
+    } else {
+      setError("メールアドレスまたはパスワードが正しくありません。");
+    }
+  };
+
+  // クライアントサイドでのレンダリングが完了していない場合は、null を返してエラーを防ぐ
+  if (!isMounted) {
+    return null; // またはローディングスピナーを表示
+  }
+
+  return (
+    <main className="flex min-h-screen flex-col p-6">      
+      <div className="bg-grey-100 h-screen flex items-center justify-center">
+        <div className="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full">
+          <h2 className="text-2xl font-semibold text-center mb-6">ログイン</h2>
+          <form onSubmit={handleLogin}>
+            {/* メールアドレス */}
+            <div className="mb-4">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700"
+              >
+                メールアドレス
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                className="mt-1 p-2 w-full border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                placeholder="example@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+
+            {/* パスワード */}
+            <div className="mb-6">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700"
+              >
+                パスワード
+              </label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                className="mt-1 p-2 w-full border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                placeholder="******"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+
+            {/* エラーメッセージ */}
+            {error && (
+              <div className="text-red-500 text-sm mb-4 text-center">
+                {error}
+              </div>
+            )}
+
+            {/* ログインボタン */}
+            <button
+              type="submit"
+              className="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50"
             >
-              <span>Log in</span> <ArrowRightIcon className="w-5 md:w-6" />
-            </Link>
-          </div>
-          {/* <div className="relative w-0 h-0 border-l-[15px] border-r-[15px] border-b-[26px] border-l-transparent border-r-transparent border-b-black"/> */}
-          <div className="flex items-center justify-center p-6 md:w-3/5 md:px-28 md:py-12">
-            {/* Add Hero Images Here */}
-            <Image 
-              src="/hero-desktop.png" 
-              width={1000} 
-              height={760} 
-              className="hidden md:block" 
-              alt="Screenshots of the dashboard project showing desktop version"
-            />
-            <Image
-              src="/hero-mobile.png" 
-              width={560} 
-              height={620} 
-              className="block md:hidden" 
-              alt="Screenshots of the dashboard project showing mobile version"/>
-          </div>
+              ログイン
+            </button>
+
+            {/* パスワードを忘れた場合 */}
+            <div className="mt-4 text-center">
+              <a
+                href="#"
+                className="text-sm text-indigo-600 hover:text-indigo-500"
+              >
+                パスワードを忘れましたか？
+              </a>
+            </div>
+          </form>
         </div>
-      </main>
-    );
+      </div>
+    </main>
+  );
 }
