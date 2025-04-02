@@ -12,17 +12,21 @@ import { users } from "./app/lib/placeholder-data";
 
 // const sql = postgres(process.env.POSTGRES_URL!, {ssl:'require'});
 
-async function getUser(email: string): Promise<User | undefined>{
-    try{
-        const user = await sql<User[]>`SELECT * FROM users WHERE email = ${email}`;
-        return users.find(user => user.email === email);
-    }catch(error){
-        console.error('Failed to fetch user:', error);
-        throw new Error('Failed to fetch user.');
+async function getUser(email: string): Promise<User | undefined> {
+    try {
+      const user = await sql<User>`SELECT * FROM users WHERE email=${email}`;
+      if (user.rows[0].isoauth === true) {
+        throw new Error('User tried to login using an OAuth account without defining a password first');
+      }
+  
+      return user.rows[0];
+    } catch (error) {
+      console.log(error);
+      throw new Error('Failed to fetch user.');
     }
-}
+  }
 
-export const { auth, signIn, signOut } = NextAuth({
+export const { handlers, auth, signIn, signOut } = NextAuth({
     ...authConfig,
     providers: [
         Credentials({
